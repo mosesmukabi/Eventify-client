@@ -12,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import EventsHeader from "./components/EventsHeader";
 import Events from "./pages/Eventy/Events";
 import PostEvent from "./pages/PostEvent/PostEvent";
+import FullEvent from "./pages/FullEvent/fullEvent";
 
 // Create a QueryClient instance for react-query
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/events" element={<Events />} /> 
                 <Route path="/postEvent" element={<PostEvent />} />
+                <Route path="/event/:id" element={<FullEvent />} />
               </Routes>
             </main>
             <Footer />
