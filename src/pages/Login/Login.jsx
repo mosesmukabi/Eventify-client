@@ -33,7 +33,7 @@ function Login() {
     onSuccess: () => {
       setIsLoggedIn(true); // Update login state
       toast.success("Login successful!");
-      navigate("/"); // Redirect to the feeds page
+      navigate("/events"); // Redirect to the feeds page
     },
     onError: (error) => {
       toast.error(error.message || "An error occurred during login");

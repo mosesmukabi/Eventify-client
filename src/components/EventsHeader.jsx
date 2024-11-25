@@ -16,7 +16,7 @@ function EventsHeader() {
       <div className="text-2xl font-bold">Eventify</div>
       <nav className="space-x-4">
         <Link to="/events">Events</Link>
-        <Link to="/post-event">Post Event</Link>
+        <Link to="/postEvent">Post Event</Link>
         <Link to="/my-events">My Events</Link>
         <Link to="/joined-events">Joined Events</Link>
         <Link to="/profile">Profile</Link>

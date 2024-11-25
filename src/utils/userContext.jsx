@@ -1,9 +1,7 @@
-import React, { createContext, useState, useContext } from "react";
+import React, { createContext, useState, useContext, useEffect } from "react";
 
-// Create the UserContext
 const UserContext = createContext();
 
-// Custom hook to use the UserContext
 export const useUser = () => {
   const context = useContext(UserContext);
   if (!context) {
@@ -12,18 +10,27 @@ export const useUser = () => {
   return context;
 };
 
-// UserProvider component
 export const UserProvider = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // Initialize `isLoggedIn` from localStorage
+  const [isLoggedIn, setIsLoggedIn] = useState(() => {
+    return localStorage.getItem("isLoggedIn") === "true";
+  });
 
-  // Function to handle logout
+  useEffect(() => {
+    localStorage.setItem("isLoggedIn", isLoggedIn);
+  }, [isLoggedIn]);
+
+  const login = () => {
+    setIsLoggedIn(true);
+  };
+
   const logout = () => {
     setIsLoggedIn(false);
-    // Additional tasks like clearing tokens can be added here
+    localStorage.removeItem("isLoggedIn");
   };
 
   return (
-    <UserContext.Provider value={{ isLoggedIn, setIsLoggedIn, logout }}>
+    <UserContext.Provider value={{ isLoggedIn, setIsLoggedIn, login, logout }}>
       {children}
     </UserContext.Provider>
   );

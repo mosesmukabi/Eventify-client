@@ -10,6 +10,8 @@ import { QueryClient, QueryClientProvider } from "react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import EventsHeader from "./components/EventsHeader";
+import Events from "./pages/Eventy/Events";
+import PostEvent from "./pages/PostEvent/PostEvent";
 
 // Create a QueryClient instance for react-query
 const queryClient = new QueryClient();
@@ -26,6 +28,8 @@ function App() {
                 <Route path="/" element={<Hero />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/events" element={<Events />} /> 
+                <Route path="/postEvent" element={<PostEvent />} />
               </Routes>
             </main>
             <Footer />
@@ -39,7 +43,7 @@ function App() {
 
 // Separate conditional header for readability and reuse
 const ConditionalHeader = () => {
-  const { isLoggedIn } = useUser(); // Access `isLoggedIn` from context
+  const { isLoggedIn } = useUser();
   return isLoggedIn ? <EventsHeader /> : <Header />;
 };
 
