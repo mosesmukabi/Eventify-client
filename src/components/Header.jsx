@@ -10,10 +10,10 @@ function Header() {
         </div>
         <nav className="flex items-center gap-4">
           <Link to="/" className="text-gray-700 hover:text-blue-600">Home</Link>
-          <Link to="/signup" className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+          <Link to="/signup" className="bg-cyan-950 text-white px-4 py-2 rounded hover:bg-cyan-800">
             Sign Up
           </Link>
-          <Link to="/login" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
+          <Link to="/login" className="bg-sky-400 text-white px-4 py-2 rounded hover:bg-sky-500">
             Login
           </Link>
         </nav>

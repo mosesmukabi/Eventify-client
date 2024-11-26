@@ -1,10 +1,15 @@
 import React from "react";
-import { useQuery } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 import apiBase from "../../utils/apiBase";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function MyEvents() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // Fetch user's events
   const { isLoading, isError, error, data } = useQuery({
     queryKey: ["myEvents"],
     queryFn: async () => {
@@ -20,16 +25,55 @@ function MyEvents() {
     },
   });
 
-  if (isLoading) {
-    return <p>Loading...</p>;
-  }
-  if (isError) {
-    return <p>Error: {error.message}</p>;
-  }
+  // Mutation for deleting an event
+  const deleteMutation = useMutation(
+    async (id) => {
+      const response = await fetch(`${apiBase}/events/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message);
+      }
+      return await response.json();
+    },
+    {
+      onSuccess: () => {
+        toast.success("Event deleted successfully!");
+        queryClient.invalidateQueries(["myEvents"]); // Refetch events after deletion
+      },
+      onError: (error) => {
+        toast.error(error.message || "Error deleting event!");
+      },
+    }
+  );
+
+  const handleDelete = (id) => {
+    deleteMutation.mutate(id);
+  };
 
   const handleCreateEvent = () => {
     navigate("/postEvent");
   };
+
+  const handleUpdate = (eventId) => {
+    console.log("Update event:", eventId);
+    // Add logic to navigate to the update form or perform update actions
+  };
+
+  const handleParticipants = (eventId) => {
+    console.log("View participants for event:", eventId);
+    // Add logic to navigate to participants page or show participants
+  };
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+
+  if (isError) {
+    return <p>Error: {error.message}</p>;
+  }
 
   return (
     <div className="bg-gray-100 py-8">
@@ -74,14 +118,15 @@ function MyEvents() {
                 <div className="mt-4 flex flex-col gap-2">
                   {/* Delete Button */}
                   <button
-                    className="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600"
+                    className="w-full bg-gray-600 text-white py-2 rounded hover:bg-black"
                     onClick={() => handleDelete(event.id)}
+                    disabled={deleteMutation.isLoading}
                   >
-                    Delete
+                    {deleteMutation.isLoading ? "Deleting..." : "Delete"}
                   </button>
                   {/* Update Button */}
                   <button
-                    className="w-full bg-yellow-500 text-white py-2 rounded hover:bg-yellow-600"
+                    className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
                     onClick={() => handleUpdate(event.id)}
                   >
                     Update
@@ -91,7 +136,7 @@ function MyEvents() {
                     className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
                     onClick={() => handleParticipants(event.id)}
                   >
-                    Participants
+                    View Event Participants
                   </button>
                 </div>
               </div>
@@ -104,19 +149,3 @@ function MyEvents() {
 }
 
 export default MyEvents;
-
-// Event Handlers (To be implemented)
-function handleDelete(eventId) {
-  console.log("Delete event:", eventId);
-  // Add logic to delete the event
-}
-
-function handleUpdate(eventId) {
-  console.log("Update event:", eventId);
-  // Add logic to navigate to the update form or perform update actions
-}
-
-function handleParticipants(eventId) {
-  console.log("View participants for event:", eventId);
-  // Add logic to navigate to participants page or show participants
-}

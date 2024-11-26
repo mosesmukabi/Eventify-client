@@ -58,7 +58,7 @@ function Login() {
         className="bg-white p-6 rounded-lg shadow-lg w-full max-w-sm"
         onSubmit={handleLogin}
       >
-        <h2 className="text-2xl font-bold text-center mb-6 text-green-600">Welcome Back!</h2>
+        <h2 className="text-2xl font-bold text-center mb-6 text-black">Welcome Back!</h2>
         <div className="mb-4">
           <label className="block text-gray-700 text-sm mb-2" htmlFor="email">
             Email Address
@@ -87,7 +87,7 @@ function Login() {
         </div>
         <button
           type="submit"
-          className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
+          className="w-full bg-blue-400 text-white py-2 rounded-lg hover:bg-blue-500"
           disabled={isLoading}
         >
           {isLoading ? "Logging in..." : "Login"}
