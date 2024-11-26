@@ -49,20 +49,23 @@ function FullEvent() {
           className="w-full h-64 object-cover"
         />
         <div className="p-6">
-          <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">
-            {data.title}
-          </h2>
-          {/* Created at and Created by section */}
-          <div className="flex justify-between text-gray-600 text-sm mb-4">
+        <div className="flex justify-between text-gray-600 text-sm mb-4">
             <p>
               <span className="font-semibold">Created on:</span>{" "}
               {new Date(data.createdAt).toDateString()}
             </p>
             <p>
-              <span className="font-semibold">Created by:</span> {data.user.firstName}
+              <span className="font-semibold">Upadted at:</span>{" "}
+              {new Date(data.updatedAt).toDateString()}
+            </p>
+            <p>
+              <span className="font-semibold">Created by:</span> {data.user.firstName} {data.user.lastName}
             </p>
           </div>
-          {/* Centered details */}
+          <h2 className="text-3xl font-bold text-gray-800 mb-4 text-center">
+            {data.title}
+          </h2>
+        
           <div className="text-center">
             <p className="text-gray-700 mb-4">
               <span className="font-semibold text-gray-800">Theme:</span>{" "}

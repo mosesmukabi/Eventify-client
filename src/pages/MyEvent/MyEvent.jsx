@@ -57,8 +57,8 @@ function MyEvents() {
     navigate("/postEvent");
   };
 
-  const handleUpdate = (eventId) => {
-    console.log("Update event:", eventId);
+  const handleUpdate = (id) => {
+    navigate(`/edit/${id}`);
     // Add logic to navigate to the update form or perform update actions
   };
 

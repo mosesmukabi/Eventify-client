@@ -73,7 +73,7 @@ function Events() {
               className="w-full h-48 object-cover"
             />
             <div className="p-4">
-              <p className="text-sm text-gray-500">Created by {event.user.firstName }</p>
+              <p className="text-sm text-gray-500">Created by {event.user.firstName } {event.user.lastName}</p>
               <h2 className="text-lg font-bold text-gray-800 mt-2">
                 {event.title}
               </h2>
