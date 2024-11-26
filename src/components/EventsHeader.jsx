@@ -17,7 +17,7 @@ function EventsHeader() {
       <nav className="space-x-4">
         <Link to="/events">Events</Link>
         <Link to="/postEvent">Post Event</Link>
-        <Link to="/my-events">My Events</Link>
+        <Link to="/myEvents">My Events</Link>
         <Link to="/joined-events">Joined Events</Link>
         <Link to="/profile">Profile</Link>
         <button
