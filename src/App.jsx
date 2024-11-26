@@ -15,6 +15,7 @@ import PostEvent from "./pages/PostEvent/PostEvent";
 import FullEvent from "./pages/FullEvent/fullEvent";
 import MyEvents from "./pages/MyEvent/MyEvent";
 import EditEvent from "./pages/EditEvent/EditEvent";
+import UpdateProfile from "./pages/personalDetails/personalDetails";
 // Create a QueryClient instance for react-query
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ function App() {
                 <Route path="/event/:id" element={<FullEvent />} />
                 <Route path="/myEvents" element={<MyEvents />} />
                 <Route path="/edit/:id" element={<EditEvent />} />
+                <Route path="/profile" element={<UpdateProfile />} /> 
               </Routes>
             </main>
             <Footer />
