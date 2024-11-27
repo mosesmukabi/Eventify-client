@@ -1,63 +1,93 @@
-import React from "react";
-import { useQuery } from "react-query";
+import React, { useState, useEffect } from "react";
+import { useQuery, useMutation } from "react-query";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import apiBase from "../../utils/apiBase";
 import { Link } from "react-router-dom";
 
-// const Events = () => {
-//   const events = [
-//     {
-//       id: 1,
-//       image: "",
-//       createdBy: "John Doe",
-//       title: "Exploring React Components",
-//       theme: "Technology",
-//     },
-//     {
-//       id: 2,
-//       image: "",
-//       createdBy: "John Doe",
-//       title: "Mastering Tailwind CSS",
-//       theme: "Design",
-//     },
-//     {
-//       id: 3,
-//       image: "",
-//       createdBy: "John Doe",
-//       title: "Building with JavaScript",
-//       theme: "Development",
-//     },
-//     {
-//       id: 4,
-//       image: "",
-//       createdBy: "John Doe",
-//       title: "Scaling Your Web App",
-//       theme: "Engineering",
-//     },
-//   ];
-
-
 function Events() {
-  const{ isLoading, isError, error, data} = useQuery({
-    queryFn: async () => {
-      const response = await fetch (`${apiBase}/events` , {
-        credentials: "include",
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message);
-      }
-      const data = await response.json(); 
-      return data
+  const [joinedEvents, setJoinedEvents] = useState(() => {
+    // Retrieve joined events from local storage
+    const storedEvents = localStorage.getItem("joinedEvents");
+    return storedEvents ? JSON.parse(storedEvents) : [];
+  });
+
+  // Fetch events
+  const { isLoading, isError, error, data } = useQuery("events", async () => {
+    const response = await fetch(`${apiBase}/events`, {
+      credentials: "include",
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message);
     }
-  })
+    return response.json();
+  });
+
+  // Mutation for joining an event
+  const joinEventMutation = useMutation(async (eventId) => {
+    const response = await fetch(`${apiBase}/events/${eventId}/join`, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message);
+    }
+    return response.json();
+  });
+
+  // Mutation for canceling a joined event
+  const cancelEventMutation = useMutation(async (eventId) => {
+    const response = await fetch(`${apiBase}/events/${eventId}/cancel`, {
+      method: "POST",
+      credentials: "include",
+    });
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message);
+    }
+    return response.json();
+  });
+
+  // Handle joining an event
+const handleJoin = async (eventId) => {
+  try {
+    await joinEventMutation.mutateAsync(eventId);
+    const updatedEvents = [...joinedEvents, eventId];
+    setJoinedEvents(updatedEvents);
+    localStorage.setItem("joinedEvents", JSON.stringify(updatedEvents)); // Save to local storage
+    toast.success("Successfully joined the event!", { position: "top-right" });
+  } catch (error) {
+    toast.error(`Error: ${error.message}`, { position: "top-right" });
+    console.error(error.message);
+  }
+};
+
+// Handle canceling a joined event
+const handleCancel = async (eventId) => {
+  try {
+    await cancelEventMutation.mutateAsync(eventId);
+    const updatedEvents = joinedEvents.filter((id) => id !== eventId);
+    setJoinedEvents(updatedEvents);
+    localStorage.setItem("joinedEvents", JSON.stringify(updatedEvents)); // Save to local storage
+    toast.info("Event join canceled.", { position: "top-right" });
+  } catch (error) {
+    toast.error(`Error: ${error.message}`, { position: "top-right" });
+    console.error(error.message);
+  }
+};
+
+
+  // Handle loading and error states
   if (isLoading) {
     return <p>Loading...</p>;
   }
   if (isError) {
     return <p>Error: {error.message}</p>;
   }
-  const events = data;
 
+  // Render events
   return (
     <div className="bg-gray-100 py-8">
       <h1 className="text-2xl font-bold text-center mb-6">Upcoming Events</h1>
@@ -73,7 +103,9 @@ function Events() {
               className="w-full h-48 object-cover"
             />
             <div className="p-4">
-              <p className="text-sm text-gray-500">Created by {event.user.firstName } {event.user.lastName}</p>
+              <p className="text-sm text-gray-500">
+                Created by {event.user.firstName} {event.user.lastName}
+              </p>
               <h2 className="text-lg font-bold text-gray-800 mt-2">
                 {event.title}
               </h2>
@@ -84,9 +116,21 @@ function Events() {
               >
                 Read more
               </Link>
-              <button className="block w-full bg-blue-500 text-white text-center py-2 rounded mt-4 hover:bg-blue-600">
-                Join Event
-              </button>
+              {joinedEvents.includes(event.id) ? (
+                <button
+                  onClick={() => handleCancel(event.id)}
+                  className="block w-full bg-red-500 text-white text-center py-2 rounded mt-4 hover:bg-red-600"
+                >
+                  Cancel Join Event
+                </button>
+              ) : (
+                <button
+                  onClick={() => handleJoin(event.id)}
+                  className="block w-full bg-blue-500 text-white text-center py-2 rounded mt-4 hover:bg-blue-600"
+                >
+                  Join Event
+                </button>
+              )}
             </div>
           </div>
         ))}

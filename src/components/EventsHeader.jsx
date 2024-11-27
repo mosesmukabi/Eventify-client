@@ -47,7 +47,7 @@ function EventsHeader() {
           My Events
         </NavLink>
         <NavLink
-          to="/joined-events"
+          to="/JoinedEvents"
           className={({ isActive }) =>
             `transition-all pb-1 border-b-2 ${
               isActive ? "border-white" : "border-transparent"
