@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useQuery, useMutation } from "react-query";
+import { useQuery, useMutation, useQueryClient } from "react-query";
 import apiBase from "../../utils/apiBase";
 import { toast } from "react-toastify"; // ToastContainer handled globally
 import PasswordUpdate from "../passwordUpdate/passwordUpdate";
@@ -8,6 +8,8 @@ function UpdateProfile() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
+
+  const queryClient = useQueryClient();
 
   const { isError, error } = useQuery(
     "fetchUserData",
@@ -23,9 +25,10 @@ function UpdateProfile() {
     },
     {
       onSuccess: (data) => {
-        setFirstName(data.firstName || "");
-        setLastName(data.lastName || "");
-        setEmail(data.email || "");
+        // Only set state if the fields are empty
+        setFirstName((prev) => (prev === "" ? data.firstName : prev));
+        setLastName((prev) => (prev === "" ? data.lastName : prev));
+        setEmail((prev) => (prev === "" ? data.email : prev));
       },
       onError: () => {
         toast.error("Failed to fetch user data");
@@ -35,36 +38,38 @@ function UpdateProfile() {
 
   const mutation = useMutation(
     async (updatedInfo) => {
-      console.log("Payload being sent to the server:", updatedInfo);
+      console.log("Data being sent to backend:", updatedInfo); // Log the payload here
       const response = await fetch(`${apiBase}/users`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(updatedInfo),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
-        console.error("Server error response:", errorData);
         throw new Error(errorData.message || "Failed to update profile");
       }
-  
+
       const data = await response.json();
       return data;
     },
     {
       onSuccess: () => {
         toast.success("Profile updated successfully");
+        queryClient.invalidateQueries("fetchUserData");
       },
       onError: (error) => {
-        const message = error.message || "Something went wrong. Please try again later.";
+        const message =
+          error.message || "Something went wrong. Please try again later.";
         toast.error(message);
       },
     }
   );
-  
+
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Trigger the mutation with updated profile data
     mutation.mutate({ firstName, lastName, email });
   };
 
