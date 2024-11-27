@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "react-query";
 import apiBase from "../../utils/apiBase";
 import { Link, useNavigate } from "react-router-dom";
@@ -8,6 +8,9 @@ import "react-toastify/dist/ReactToastify.css";
 function MyEvents() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const [participants, setParticipants] = useState([]);
+  const [viewingEvent, setViewingEvent] = useState(null);
 
   // Fetch user's events
   const { isLoading, isError, error, data } = useQuery({
@@ -20,8 +23,7 @@ function MyEvents() {
         const error = await response.json();
         throw new Error(error.message);
       }
-      const data = await response.json();
-      return data;
+      return await response.json();
     },
   });
 
@@ -49,6 +51,30 @@ function MyEvents() {
     }
   );
 
+  // Fetch participants for an event
+  const handleParticipants = async (eventId) => {
+    if (viewingEvent === eventId) {
+      // Hide participants if the same button is clicked again
+      setViewingEvent(null);
+      setParticipants([]);
+    } else {
+      try {
+        const response = await fetch(`${apiBase}/joined-events?eventId=${eventId}`, {
+          credentials: "include",
+        });
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message);
+        }
+        const participantsData = await response.json();
+        setParticipants(participantsData); // Update participants state
+        setViewingEvent(eventId); // Set the current viewing event
+      } catch (error) {
+        toast.error(error.message || "Error fetching participants!");
+      }
+    }
+  };
+
   const handleDelete = (id) => {
     deleteMutation.mutate(id);
   };
@@ -59,12 +85,6 @@ function MyEvents() {
 
   const handleUpdate = (id) => {
     navigate(`/edit/${id}`);
-    // Add logic to navigate to the update form or perform update actions
-  };
-
-  const handleParticipants = (eventId) => {
-    console.log("View participants for event:", eventId);
-    // Add logic to navigate to participants page or show participants
   };
 
   if (isLoading) {
@@ -133,11 +153,28 @@ function MyEvents() {
                   </button>
                   {/* Participants Button */}
                   <button
-                    className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600"
+                    className={`w-full py-2 rounded ${
+                      viewingEvent === event.id
+                        ? "bg-red-500 hover:bg-red-600"
+                        : "bg-green-500 hover:bg-green-600"
+                    } text-white`}
                     onClick={() => handleParticipants(event.id)}
                   >
-                    View Event Participants
+                    {viewingEvent === event.id ? "Hide Participants" : "View Event Participants"}
                   </button>
+                  {/* Participants List */}
+                  {viewingEvent === event.id && participants.length > 0 && (
+                    <div className="mt-4">
+                      <h3 className="font-semibold text-lg">Participants:</h3>
+                      <ul className="list-disc pl-5">
+                        {participants.map((participant, idx) => (
+                          <li key={idx}>
+                            {participant.user.firstName} {participant.user.lastName}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

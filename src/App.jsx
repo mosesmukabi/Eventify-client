@@ -17,6 +17,7 @@ import MyEvents from "./pages/MyEvent/MyEvent";
 import EditEvent from "./pages/EditEvent/EditEvent";
 import UpdateProfile from "./pages/personalDetails/personalDetails";
 import JoinedEvents from "./pages/JoinedEvents/JoinedEvents";
+import EventParticipants from "./pages/EventParticipants/EventParticipants";
 // Create a QueryClient instance for react-query
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ function App() {
                 <Route path="/edit/:id" element={<EditEvent />} />
                 <Route path="/profile" element={<UpdateProfile />} /> 
                 <Route path="/joinedEvents" element={<JoinedEvents />} />
+                <Route path="/eventParticipants/:id" element={<EventParticipants />} />
               </Routes>
             </main>
             <Footer />
