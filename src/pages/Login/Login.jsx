@@ -31,8 +31,9 @@ function Login() {
       return response.json();
     },
     onSuccess: () => {
-      setIsLoggedIn(true); // Update login state
       toast.success("Login successful!");
+      setIsLoggedIn(true); // Update login state
+      
       navigate("/events"); // Redirect to the feeds page
     },
     onError: (error) => {
