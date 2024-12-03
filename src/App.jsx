@@ -61,7 +61,7 @@ function App() {
   );
 }
 
-// Separate conditional header for readability and reuse
+
 const ConditionalHeader = () => {
   const { isLoggedIn } = useUser();
   return isLoggedIn ? <EventsHeader /> : <Header />;

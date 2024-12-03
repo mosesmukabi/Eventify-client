@@ -6,11 +6,7 @@ import apiBase from "../../utils/apiBase";
 import { Link } from "react-router-dom";
 
 function Events() {
-  const [joinedEvents, setJoinedEvents] = useState(() => {
-    // Retrieve joined events from local storage
-    const storedEvents = localStorage.getItem("joinedEvents");
-    return storedEvents ? JSON.parse(storedEvents) : [];
-  });
+  const [joinedEvents, setJoinedEvents] = useState([]); // Track events joined by the logged-in user
 
   // Fetch events
   const { isLoading, isError, error, data } = useQuery("events", async () => {
@@ -23,6 +19,28 @@ function Events() {
     }
     return response.json();
   });
+
+  // Fetch joined events for the current user
+  useEffect(() => {
+    const fetchJoinedEvents = async () => {
+      try {
+        const response = await fetch(`${apiBase}/user/joined-events`, {
+          credentials: "include",
+        });
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.message);
+        }
+        const result = await response.json();
+        setJoinedEvents(result); // Set joined events state from the server
+      } catch (error) {
+        console.error("Error fetching joined events:", error.message);
+        toast.error("Failed to load joined events.", { position: "top-right" });
+      }
+    };
+
+    fetchJoinedEvents();
+  }, []);
 
   // Mutation for joining an event
   const joinEventMutation = useMutation(async (eventId) => {
@@ -51,33 +69,28 @@ function Events() {
   });
 
   // Handle joining an event
-const handleJoin = async (eventId) => {
-  try {
-    await joinEventMutation.mutateAsync(eventId);
-    const updatedEvents = [...joinedEvents, eventId];
-    setJoinedEvents(updatedEvents);
-    localStorage.setItem("joinedEvents", JSON.stringify(updatedEvents)); // Save to local storage
-    toast.success("Successfully joined the event!", { position: "top-right" });
-  } catch (error) {
-    toast.error(`Error: ${error.message}`, { position: "top-right" });
-    console.error(error.message);
-  }
-};
+  const handleJoin = async (eventId) => {
+    try {
+      await joinEventMutation.mutateAsync(eventId);
+      setJoinedEvents((prev) => [...prev, eventId]); // Update state on join
+      toast.success("Successfully joined the event!", { position: "top-right" });
+    } catch (error) {
+      toast.error(`Error: ${error.message}`, { position: "top-right" });
+      console.error(error.message);
+    }
+  };
 
-// Handle canceling a joined event
-const handleCancel = async (eventId) => {
-  try {
-    await cancelEventMutation.mutateAsync(eventId);
-    const updatedEvents = joinedEvents.filter((id) => id !== eventId);
-    setJoinedEvents(updatedEvents);
-    localStorage.setItem("joinedEvents", JSON.stringify(updatedEvents)); // Save to local storage
-    toast.info("Event join canceled.", { position: "top-right" });
-  } catch (error) {
-    toast.error(`Error: ${error.message}`, { position: "top-right" });
-    console.error(error.message);
-  }
-};
-
+  // Handle canceling a joined event
+  const handleCancel = async (eventId) => {
+    try {
+      await cancelEventMutation.mutateAsync(eventId);
+      setJoinedEvents((prev) => prev.filter((id) => id !== eventId)); // Update state on cancel
+      toast.info("Event join canceled.", { position: "top-right" });
+    } catch (error) {
+      toast.error(`Error: ${error.message}`, { position: "top-right" });
+      console.error(error.message);
+    }
+  };
 
   // Handle loading and error states
   if (isLoading) {

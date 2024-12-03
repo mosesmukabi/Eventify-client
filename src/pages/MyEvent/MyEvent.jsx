@@ -59,14 +59,17 @@ function MyEvents() {
       setParticipants([]);
     } else {
       try {
-        const response = await fetch(`${apiBase}/joined-events?eventId=${eventId}`, {
+        const response = await fetch(`${apiBase}/users/joined-event?eventId=${eventId}`, {
           credentials: "include",
         });
+  
         if (!response.ok) {
           const error = await response.json();
           throw new Error(error.message);
         }
+  
         const participantsData = await response.json();
+        console.log("Fetched participants:", participantsData); // Debugging log
         setParticipants(participantsData); // Update participants state
         setViewingEvent(eventId); // Set the current viewing event
       } catch (error) {
@@ -74,6 +77,8 @@ function MyEvents() {
       }
     }
   };
+  
+  
 
   const handleDelete = (id) => {
     deleteMutation.mutate(id);
@@ -164,17 +169,17 @@ function MyEvents() {
                   </button>
                   {/* Participants List */}
                   {viewingEvent === event.id && participants.length > 0 && (
-                    <div className="mt-4">
-                      <h3 className="font-semibold text-lg">Participants:</h3>
-                      <ul className="list-disc pl-5">
-                        {participants.map((participant, idx) => (
-                          <li key={idx}>
-                            {participant.user.firstName} {participant.user.lastName}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
+  <div className="mt-4">
+    <h3 className="font-semibold text-lg">Participants:</h3>
+    <ul className="list-disc pl-5">
+      {participants.map((participant, idx) => (
+        <li key={idx}>
+          {participant.firstName} {participant.lastName}
+        </li>
+      ))}
+    </ul>
+  </div>
+)}
                 </div>
               </div>
             </div>
